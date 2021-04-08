@@ -86,7 +86,7 @@ save(filename, 'calibrationRecording')
 %% ID Hammerstein Model from calibration data 
 disp('Identifying model, please wait...')
 
-H_mdl = idnlhw([2, 3, 1], 'pwlinear', 'pwlinear', 'Ts', 0.001); 
+H_mdl = idnlhw([3, 2, 1], 'pwlinear', 'unitgain', 'Ts', 0.001); 
 
 % Divide data for identification and validation
 % halfIdx = ceil(size(calibrationRecording.time,1)/2);
@@ -107,7 +107,7 @@ gripForceV = smoothdata(T1.ans.data(408024:end,1), 'SmoothingFactor', 0.03);
 
 %
 mdl = nlhw(iddata(gripForceID, stimAmpID, 0.001), H_mdl); 
-
+plot(mdl)
 %CHECK WHEN REAL DATA COLLECTED 
 gripForceVestim = sim(mdl,stimAmpV);
 mdlFit = goodnessOfFit(gripForceVestim, gripForceV, 'NRMSE'); 
