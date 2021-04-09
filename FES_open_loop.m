@@ -86,7 +86,7 @@ save(filename, 'calibrationRecording')
 %% ID Hammerstein Model from calibration data 
 disp('Identifying model, please wait...')
 
-H_mdl = idnlhw([3, 2, 1], 'pwlinear', 'unitgain', 'Ts', 0.001); 
+H_mdl = idnlhw([2, 3, 1], 'pwlinear', 'unitgain', 'Ts', 0.001); 
 
 % Divide data for identification and validation
 % halfIdx = ceil(size(calibrationRecording.time,1)/2);
