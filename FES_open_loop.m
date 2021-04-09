@@ -106,20 +106,33 @@ stimAmpV = T1.ans.data(408024:end,2);
 gripForceV = smoothdata(T1.ans.data(408024:end,1), 'SmoothingFactor', 0.03);
 
 %
-mdl = nlhw(iddata(gripForceID, stimAmpID, 0.001), H_mdl); 
+mdl = nlhw(iddata(stimAmpID, gripForceID, 0.001), H_mdl); 
 plot(mdl)
 %CHECK WHEN REAL DATA COLLECTED 
-gripForceVestim = sim(mdl,stimAmpV);
-mdlFit = goodnessOfFit(gripForceVestim, gripForceV, 'NRMSE'); 
+t = 0:0.001:3; 
+gripForceDesired = 0.02 * sin(2*pi*3*t)+0.02;
+stimAmpVestim = sim(mdl, gripForceDesired');
 figure; 
-compare(iddata(gripForceV, stimAmpV, 0.001), mdl)
-    % ADD warning when fit is below a certain threshold -> Recalibrate? 
-figure;
-% Linearise model !DO more research
-linMdl = linapp(mdl, stimAmpV); %0, 12); 
-compare(iddata(gripForceV, stimAmpV, 0.001), linMdl)
+plot(stimAmpVestim) 
+figure; 
+plot(gripForceDesired)
 
-invLinMdl = inv(linMdl)
+
+stimAmpVestim = sim(mdl, gripForceV);
+figure; 
+plot(stimAmpVestim) 
+figure; 
+plot(gripForceV)
+% mdlFit = goodnessOfFit(gripForceVestim, gripForceV, 'NRMSE'); 
+
+% compare(iddata(gripForceV, stimAmpV, 0.001), mdl)
+    % ADD warning when fit is below a certain threshold -> Recalibrate? 
+% figure;
+% Linearise model !DO more research
+% linMdl = linapp(mdl, stimAmpV); %0, 12); 
+% compare(iddata(gripForceV, stimAmpV, 0.001), linMdl)
+
+% invLinMdl = inv(linMdl)
 %%
 time =  [0:0.001:0.001*(size(gripForceV)-1)]; 
 stimPred = lsim(invLinMdl, gripForceV,time)
