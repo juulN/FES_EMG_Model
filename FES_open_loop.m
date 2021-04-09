@@ -118,11 +118,11 @@ figure;
 plot(gripForceDesired)
 
 
-stimAmpVestim = sim(mdl, gripForceV);
+stimAmpVestim = sim(mdl, gripForceDesired');
 figure; 
 plot(stimAmpVestim) 
 figure; 
-plot(gripForceV)
+plot(gripForceDesired)
 % mdlFit = goodnessOfFit(gripForceVestim, gripForceV, 'NRMSE'); 
 
 % compare(iddata(gripForceV, stimAmpV, 0.001), mdl)
