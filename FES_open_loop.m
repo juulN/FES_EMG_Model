@@ -84,7 +84,7 @@ filename = sprintf('calibrationRecording_%s', datestr(now,'mm-dd-yyyy HH-MM'));
 save(filename, 'calibrationRecording') 
 
 %% ID Hammerstein Model from calibration data 
-disp('Identifying model, please wait...')
+% disp('Identifying model, please wait...')
 
 H_mdl = idnlhw([3, 2, 1], 'pwlinear', 'unitgain', 'Ts', 0.001); 
 
@@ -99,12 +99,20 @@ H_mdl = idnlhw([3, 2, 1], 'pwlinear', 'unitgain', 'Ts', 0.001);
 
 %
 T1 = load('FES_force_AY_21_03_11_1.mat');
-stimAmpID = T1.ans.data(1:408024,2);
-gripForceID = smoothdata(T1.ans.data(1:408024,1), 'SmoothingFactor', 0.03);
+figure;
+plot(T1.ans.data(1:408024,2))
+%plot(T1.ans.data(78984:118065,2))
+%stimAmpID = T1.ans.data(1:408024,2);
+%gripForceID = smoothdata(T1.ans.data(1:408024,1), 'SmoothingFactor', 0.03);
 
-stimAmpV = T1.ans.data(408024:end,2);
-gripForceV = smoothdata(T1.ans.data(408024:end,1), 'SmoothingFactor', 0.03);
+stimAmpID = T1.ans.data(78984:118065,2);
+gripForceID = smoothdata(T1.ans.data(78984:118065,1), 'SmoothingFactor', 0.03);
 
+%stimAmpV = T1.ans.data(408024:end,2);
+%gripForceV = smoothdata(T1.ans.data(408024:end,1), 'SmoothingFactor', 0.03);
+
+stimAmpV = T1.ans.data(151157:190237,2);
+gripForceV = smoothdata(T1.ans.data(151157:190237,1), 'SmoothingFactor', 0.03);
 %
 mdl = nlhw(iddata(gripForceID, stimAmpID, 0.001), H_mdl); 
 plot(mdl)
@@ -120,6 +128,8 @@ linMdl = linapp(mdl, stimAmpV); %0, 12);
 compare(iddata(gripForceV, stimAmpV, 0.001), linMdl)
 
 invLinMdl = inv(linMdl)
+plot(invLinMdl)
+% disp('...Done')
 %%
 time =  [0:0.001:0.001*(size(gripForceV)-1)]; 
 stimPred = lsim(invLinMdl, gripForceV,time)
