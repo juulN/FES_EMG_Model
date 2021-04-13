@@ -123,19 +123,4 @@ figure;
 plot(stimAmpVestim) 
 figure; 
 plot(gripForceDesired)
-% mdlFit = goodnessOfFit(gripForceVestim, gripForceV, 'NRMSE'); 
 
-% compare(iddata(gripForceV, stimAmpV, 0.001), mdl)
-    % ADD warning when fit is below a certain threshold -> Recalibrate? 
-% figure;
-% Linearise model !DO more research
-% linMdl = linapp(mdl, stimAmpV); %0, 12); 
-% compare(iddata(gripForceV, stimAmpV, 0.001), linMdl)
-
-% invLinMdl = inv(linMdl)
-%%
-time =  [0:0.001:0.001*(size(gripForceV)-1)]; 
-stimPred = lsim(invLinMdl, gripForceV,time)
-
-figure; 
-plot(stimPred)
