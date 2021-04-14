@@ -86,6 +86,9 @@ save(filename, 'calibrationRecording')
 %% ID Hammerstein Model from calibration data 
 disp('Identifying model, please wait...')
 
+% InputNL = pwlinear('NumberofUnits', 5);
+% InputNL = poly1d('Degree', 10);
+% H_mdl = idnlhw([2, 3, 1], InputNL, 'unitgain', 'Ts', 0.001); 
 H_mdl = idnlhw([2, 3, 1], 'pwlinear', 'unitgain', 'Ts', 0.001); 
 
 % Divide data for identification and validation
@@ -108,6 +111,23 @@ gripForceV = smoothdata(T1.ans.data(408024:end,1), 'SmoothingFactor', 0.03);
 %
 mdl = nlhw(iddata(gripForceID, stimAmpID, 0.001), H_mdl); 
 plot(mdl)
+%%
+ft = fittype( 'a/(1+exp(-b*x))', 'independent', 'x', 'dependent', 'y' );
+opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
+opts.Display = 'Off';
+opts.StartPoint = [0.000001 0.00001];
+
+xData = mdl.InputNonlinearity.BreakPoints(1,:)'; 
+yData = mdl.InputNonlinearity.BreakPoints(2,:)';
+% Fit model to data.
+[fitresult, gof] = fit( xData, yData, ft, opts )
+
+plot(fitresult, mdl.InputNonlinearity.BreakPoints(1,:), mdl.InputNonlinearity.BreakPoints(2,:))
+
+p = polyfit(mdl.InputNonlinearity.BreakPoints(1,:), mdl.InputNonlinearity.BreakPoints(2,:), 5)
+p1 = polyval(p, 0:0.1:12)
+figure; 
+plot(p1) 
 %CHECK WHEN REAL DATA COLLECTED 
 gripForceVestim = sim(mdl,stimAmpV);
 mdlFit = goodnessOfFit(gripForceVestim, gripForceV, 'NRMSE'); 
