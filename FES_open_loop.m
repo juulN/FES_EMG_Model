@@ -25,11 +25,24 @@ u2 = udpport("LocalPort",22383) %increase by one if error
                              % time(us)(1ms -3000ms)
                                            
 % writeline(bt,strcat("stim on"));
-stimMA = 0;
+
+%% Set parameters/initialise model
 buffer = 1000; % Buffer for?? 
-elecArray = [16, 1, 5]; 
-%% Set safety limits here 
+elecArray = [16, 1, 5]; % Electrode number for each finger 
 stimMax = 2; %20mA for aaron
 forceMax = 0.2;
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
+
+%% Identification of model for each electrode
 h_mdls = calibration(elecArray, maxStimAmp, maxForce);
+
+%% Stimulate 
+while True
+    pwFES = read(u2,buffer,"double");
+    writeline(bt,strcat("freq ",num2str(200)));
+    cmd = generate_command(elecArray, [stimAmp stimAmp stimAmp], [pwFES], elecname);
+    writeline(bt,cmd)
+    writeline(bt,strcat("stim ",elecname));
+end
+
+
