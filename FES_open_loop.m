@@ -1,6 +1,6 @@
 %% Open loop FES control - 
 % Syncs with Simulink model calibrationSim
-clc; clear all; close all;
+% clc; clear all; close all;
 
 
 %% Set up Bluetooth connection with Technalia FES device and Init UDP ports
@@ -20,7 +20,7 @@ elecname = "testname1"
 % Write new stim file (last char of string not transmitted -> add space at end of string)
 writeline(bt, "sdcard rm default/test/ve5.ptn ")
 writeline(bt, "sdcard cat > default/test/ve5.ptn ")
-writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") % 
+writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 1000 ") % 
                                      % %pulsewith 
                              % time(us)(1ms -3000ms)
                       % %amplitude 
@@ -60,24 +60,30 @@ h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
 
 
 %% Stimulate 
+writeline(bt, "sdcard rm default/test/ve5.ptn ")
+writeline(bt, "sdcard cat > default/test/ve5.ptn ")
+writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 100 ") % 
+
 testname = "testname1"; 
 % Anode is 2, select others 
 % elecArray = [16, 1, 5];
-amplitude =6; 
+% amplitude =6; 
 velecnumber = 5; 
-stimAmp = 8; 
+stimAmp = 7; 
 elecname = "testname1"
+u2 = udpport("LocalPort",22397) %increase by one if error
 
 open 'openloopFEScontrollerSim'
 set_param('openloopFEScontrollerSim','SimulationCommand','start')
 
 while true
     pwFES = read(u2,999,"double");  % ensure buffer is multiple of number of electrodes used 
-    pwFES(end-length(elecArray)+1:end)
-%     writeline(bt,strcat("freq ",num2str(200)));
-    cmd = generate_command(elecArray, [stimAmp stimAmp stimAmp], pwFES(end-length(elecArray)+1:end), elecname);
-%     writeline(bt,cmd)
-%     writeline(bt,strcat("stim ",elecname));
+    pwFES(end-2:end)
+    writeline(bt,strcat("freq ",num2str(200)));
+    cmd = generate_command(elecArray, [stimAmp stimAmp stimAmp], pwFES(end-2:end), elecname);
+    writeline(bt,cmd)
+    writeline(bt,strcat("stim ",elecname));
+    pause(0.1)
 end
 
 set_param('openloopFEScontrollerSim','SimulationCommand','stop')

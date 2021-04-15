@@ -4,8 +4,8 @@ function [mdl] = calibration(nElec, stimAmpM, forceMax, modelStructure, bluetoot
 
 %% Start recording for calibration
 % Ensure real-time kernell is installed
-u1 = udpport("LocalPort",12384) %increase by one if error
-u2 = udpport("LocalPort",22385) %increase by one if error
+u1 = udpport("LocalPort",12386) %increase by one if error
+u2 = udpport("LocalPort",22387) %increase by one if error
 
 buffer = 1000;
 open 'calibrationSim'
@@ -51,7 +51,7 @@ for i = 1:length(nElec)
             writeline(bt,cmd)
             writeline(bt,strcat("stim ",elecname));
             write(u1,0,"double","LocalHost",5000);
-            pause(3)
+            pause(4)
         end
     end
     set_param('calibrationSim','SimulationCommand','stop')
