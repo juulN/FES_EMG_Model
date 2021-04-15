@@ -30,7 +30,7 @@ stimMA = 0;
 buffer = 1000; % Buffer for?? 
 
 %% Set safety limits here 
-stimMax = 10; %20mA for aaron
+stimMax = 9; %20mA for aaron
 forceMax = 0.2;
 
 
