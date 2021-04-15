@@ -2,6 +2,7 @@
 % Syncs with Simulink model calibrationSim
 clc; clear all; close all;
 
+
 %% Set up Bluetooth connection with Technalia FES device and Init UDP ports
 bt = bluetooth("0016A474B78F", 1);  %MAC address of device 
 writeline(bt,"iam DESKTOP");
@@ -20,17 +21,22 @@ elecname = "testname1"
 writeline(bt, "sdcard rm default/test/ve5.ptn ")
 writeline(bt, "sdcard cat > default/test/ve5.ptn ")
 writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") % 
-                             % %amplitude 
-                             % %pulsewith 
+                                     % %pulsewith 
                              % time(us)(1ms -3000ms)
-                                           
+                      % %amplitude 
+%%
+writeline(bt,strcat("freq ",num2str(35)));
+                cmd = generate_command([15], [6], [300], elecname);
+                writeline(bt,cmd)
+                writeline(bt,strcat("stim ",elecname));
+%                 write(u1,k,"double","LocalHost",5000);                             
 % writeline(bt,strcat("stim on"));
 
 %% Set parameters/initialise model
 buffer = 1000; % Buffer for?? 
 elecArray = [13, 14, 15]; % Electrode number for each finger 
 stimMax = 2; %20mA for aaron
-forceMax = 0.2;
+forceMax = 2;
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
 
 %% Identification of model for each electrode
@@ -56,7 +62,7 @@ h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
 %% Stimulate 
 testname = "testname1"; 
 % Anode is 2, select others 
-elecArray = [16, 1, 5];
+% elecArray = [16, 1, 5];
 amplitude =6; 
 velecnumber = 5; 
 stimAmp = 8; 
