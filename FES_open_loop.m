@@ -8,12 +8,12 @@ writeline(bt,"iam DESKTOP");
 writeline(bt,"battery ? ");
 writeline(bt,"elec 1 *pads_qty 16");
 
-elecname = "testname1";
+elecname = "testname1"
 
 % Init UDP ports for simulink comms 
 % matlab and simulink need to be separate instances (same computer)
-u1 = udpport("LocalPort",12383); %increase by one if error
-u2 = udpport("LocalPort",22383); %increase by one if error
+% u1 = udpport("LocalPort",12383) %increase by one if error
+% u2 = udpport("LocalPort",22383) %increase by one if error
 % 
 
 % Write new stim file (last char of string not transmitted -> add space at end of string)
@@ -27,6 +27,7 @@ writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") %
 writeline(bt,strcat("stim on"));
 stimMA = 0;
 
+%% Set parameters/initialise model
 buffer = 1000; % Buffer for?? 
 
 %% Set safety limits here 
