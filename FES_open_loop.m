@@ -1,6 +1,6 @@
 %% Open loop FES control - 
 % Syncs with Simulink model calibrationSim
-% clc; clear all; close all;
+clc; clear all; close all;
 
 
 %% Set up Bluetooth connection with Technalia FES device and Init UDP ports
@@ -20,27 +20,20 @@ elecname = "testname1"
 % Write new stim file (last char of string not transmitted -> add space at end of string)
 writeline(bt, "sdcard rm default/test/ve5.ptn ")
 writeline(bt, "sdcard cat > default/test/ve5.ptn ")
-writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 1000 ") % 
+writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") % 
                                      % %pulsewith 
                              % time(us)(1ms -3000ms)
                       % %amplitude 
-%%
-writeline(bt,strcat("freq ",num2str(35)));
-                cmd = generate_command([15], [6], [300], elecname);
-                writeline(bt,cmd)
-                writeline(bt,strcat("stim ",elecname));
-%                 write(u1,k,"double","LocalHost",5000);                             
-% writeline(bt,strcat("stim on"));
-
+%% Select elecs
+maxAmp = 12;
+elecArray = selectElec(bt, maxAmp)
 %% Set parameters/initialise model
 buffer = 1000; % Buffer for?? 
-elecArray = [13, 14, 15]; % Electrode number for each finger 
-stimMax = 2; %20mA for aaron
-forceMax = 2;
+elecArray = [11, 13, 14]; % Electrode number for each finger 
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
 
 %% Identification of model for each electrode
-maxStimAmp = 7;
+maxStimAmp = 9;
 maxForce = 0.2; 
 
 h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
@@ -60,31 +53,40 @@ h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
 
 
 %% Stimulate 
+clear u2
 writeline(bt, "sdcard rm default/test/ve5.ptn ")
 writeline(bt, "sdcard cat > default/test/ve5.ptn ")
-writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 100 ") % 
+writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 500 ") % 
 
 testname = "testname1"; 
 % Anode is 2, select others 
 % elecArray = [16, 1, 5];
 % amplitude =6; 
-velecnumber = 5; 
-stimAmp = 7; 
+velecnumber = 5;
+maxStimAmp = 9;
+
+stimAmp = maxStimAmp; 
 elecname = "testname1"
-u2 = udpport("LocalPort",22397) %increase by one if error
+u2 = udpport("LocalPort",22392) %increase by one if error
 
 open 'openloopFEScontrollerSim'
 set_param('openloopFEScontrollerSim','SimulationCommand','start')
 
+c = clock;
+clockPrev = c(4)*3600+c(5)*60+c(6);
 while true
     pwFES = read(u2,999,"double");  % ensure buffer is multiple of number of electrodes used 
-    pwFES(end-2:end)
-    writeline(bt,strcat("freq ",num2str(200)));
-    cmd = generate_command(elecArray, [stimAmp stimAmp stimAmp], pwFES(end-2:end), elecname);
-    writeline(bt,cmd)
-    writeline(bt,strcat("stim ",elecname));
-    pause(0.1)
+    c = clock;
+    clockNew = c(4)*3600+c(5)*60+c(6); 
+    if clockNew > clockPrev+0.5
+        round(pwFES(end-2:end))
+        writeline(bt,strcat("freq ",num2str(200)));
+        cmd = generate_command(elecArray, [stimAmp stimAmp stimAmp], round(pwFES(end-2:end)), elecname);
+        writeline(bt,cmd)
+        writeline(bt,strcat("stim ",elecname));
+        clockPrev = clockNew; 
+    end
 end
-
 set_param('openloopFEScontrollerSim','SimulationCommand','stop')
 
+save('openloopT3', 'controllerData')
