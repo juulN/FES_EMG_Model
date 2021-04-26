@@ -34,7 +34,7 @@ elecArray = [15];
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
 
 %% Identification of model for each electrode
-maxStimAmp = 8;
+maxStimAmp = 10;
 maxForce = 0.2; 
 
 h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
@@ -63,8 +63,8 @@ testname = "testname1";
 % Anode is 2, select others 
 % elecArray = [16, 1, 5];
 % amplitude =6; 
-velecnumber = 10;
-% maxStimAmp = 9;
+velecnumber = 11;
+% maxStimAmp = 10;
 elecArray = [11, 15, 13]; % Electrode number for each finger 
 
 stimAmp = maxStimAmp; 
@@ -77,19 +77,20 @@ set_param('openloopFEScontrollerSim','SimulationCommand','start')
 
 
 
-writeline(bt,strcat("freq ",num2str(200)));
+writeline(bt,strcat("freq ",num2str(35)));
 cmd = generate_command(elecArray, [0 0 0], [300 300 300], elecname, velecnumber);
 writeline(bt,cmd)
-writeline(bt,strcat("stim ",elecname));
+writeline(bt,strcat("stim on "));
 
 c = clock;
 clockPrev = c(4)*3600+c(5)*60+c(6);
 while true
-    pwFES = read(u2,999,"double");  % ensure buffer is multiple of number of electrodes used 
+    pwFES = read(u2,8190,"double");  % ensure buffer is multiple of number of electrodes used 
     c = clock;
     clockNew = c(4)*3600+c(5)*60+c(6); 
-    if clockNew > clockPrev+1      %Send stim every period
+    if clockNew > clockPrev+0.01      %Send stim every period
         round(pwFES(end-2:end))
+        clock
         cmd = generate_command(elecArray, [stimAmp stimAmp stimAmp], round(pwFES(end-2:end)), elecname, velecnumber);
         writeline(bt,cmd)
         clockPrev = clockNew; 

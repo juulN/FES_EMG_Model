@@ -1,7 +1,7 @@
 %% plot controller data
 % Script to plot controller data FES controller sim 
 % clear all; close all; clc
-load('openloopT20.mat', 'controllerData')
+load('openloopT27.mat', 'controllerData')
 
 figure; 
 sgtitle('Open loop control')
@@ -29,7 +29,7 @@ grid on
 grid minor
 
 %%
-load('hmdls_0426_20.mat')
+load('hmdls_0426_27.mat')
 plot(h_mdls{1})
 % plot(h_mdls{2})
 % plot(h_mdls{3})
@@ -38,7 +38,8 @@ plot(h_mdls{1})
 
 
 %%
-load('calibrationRecording_04-26-2021 11-25.mat')
+load('calibrationRecording_04-26-2021 16-52.mat')
+plot(calibrationRecording.Data)
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
 halfIdx = ceil(size(calibrationRecording.time,1)/2);
    
