@@ -26,14 +26,14 @@ writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") %
                       % %amplitude 
 %% Select elecs
 maxAmp = 12;
-elecArray = selectElec(bt, maxAmp)
+% elecArray = selectElec(bt, maxAmp)
 %% Set parameters/initialise model
 buffer = 1000; % Buffer for?? 
-elecArray = [11, 13, 14]; % Electrode number for each finger 
+elecArray = [11, 15, 13]; % Electrode number for each finger 
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
 
 %% Identification of model for each electrode
-maxStimAmp = 9;
+maxStimAmp = 10;
 maxForce = 0.2; 
 
 h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
@@ -54,23 +54,31 @@ h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
 
 %% Stimulate 
 clear u2
-writeline(bt, "sdcard rm default/test/ve5.ptn ")
-writeline(bt, "sdcard cat > default/test/ve5.ptn ")
-writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 500 ") % 
+% writeline(bt, "sdcard rm default/test/ve5.ptn ")
+% writeline(bt, "sdcard cat > default/test/ve5.ptn ")
+% writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 500 ") % 
 
 testname = "testname1"; 
 % Anode is 2, select others 
 % elecArray = [16, 1, 5];
 % amplitude =6; 
-velecnumber = 5;
+velecnumber = 10;
 maxStimAmp = 9;
 
 stimAmp = maxStimAmp; 
 elecname = "testname1"
 u2 = udpport("LocalPort",22392) %increase by one if error
 
+
 open 'openloopFEScontrollerSim'
 set_param('openloopFEScontrollerSim','SimulationCommand','start')
+
+
+
+writeline(bt,strcat("freq ",num2str(200)));
+cmd = generate_command(elecArray, [0 0 0], [300 300 300], elecname, velecnumber);
+writeline(bt,cmd)
+writeline(bt,strcat("stim ",elecname));
 
 c = clock;
 clockPrev = c(4)*3600+c(5)*60+c(6);
@@ -78,12 +86,10 @@ while true
     pwFES = read(u2,999,"double");  % ensure buffer is multiple of number of electrodes used 
     c = clock;
     clockNew = c(4)*3600+c(5)*60+c(6); 
-    if clockNew > clockPrev+0.5
+    if clockNew > clockPrev+0.010      %Send stim every period
         round(pwFES(end-2:end))
-        writeline(bt,strcat("freq ",num2str(200)));
-        cmd = generate_command(elecArray, [stimAmp stimAmp stimAmp], round(pwFES(end-2:end)), elecname);
+        cmd = generate_command(elecArray, [stimAmp stimAmp stimAmp], round(pwFES(end-2:end)), elecname, velecnumber);
         writeline(bt,cmd)
-        writeline(bt,strcat("stim ",elecname));
         clockPrev = clockNew; 
     end
 end
