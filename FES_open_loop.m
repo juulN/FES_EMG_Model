@@ -15,12 +15,12 @@ elecname = "testname1"
 % matlab and simulink need to be separate instances (same computer)
 % u1 = udpport("LocalPort",12383) %increase by one if error
 % u2 = udpport("LocalPort",22383) %increase by one if error
-% 
+%%
 
 % Write new stim file (last char of string not transmitted -> add space at end of string)
 writeline(bt, "sdcard rm default/test/ve5.ptn ")
 writeline(bt, "sdcard cat > default/test/ve5.ptn ")
-writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") % 
+writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 2000 ") % 
                                      % %pulsewith 
                              % time(us)(1ms -3000ms)
                       % %amplitude 
@@ -29,11 +29,11 @@ maxAmp = 12;
 % elecArray = selectElec(bt, maxAmp)
 %% Set parameters/initialise model
 buffer = 1000; % Buffer for?? 
-elecArray = [11, 15, 13]; % Electrode number for each finger 
+elecArray = [15]; % Electrode number for each finger 
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
 
 %% Identification of model for each electrode
-maxStimAmp = 12;
+maxStimAmp = 11;
 maxForce = 0.2; 
 stimPW = 300;
 
@@ -57,9 +57,10 @@ h_mdls = calibration(elecArray, maxStimAmp, maxForce, stimPW, h_mdl_struct, bt);
 clear u2
 
 testname = "testname1"; 
+elecArray = [10 15 13]; % Electrode number for each finger 
 
 velecnumber = 10;
-maxStimAmp = 12;
+% maxStimAmp = 12;
 
 elecname = "testname1"
 u2 = udpport("LocalPort",22392) %increase by one if error
@@ -73,16 +74,16 @@ set_param('openloopFEScontrollerSim','SimulationCommand','start')
 writeline(bt,strcat("freq ",num2str(200)));
 cmd = generate_command(elecArray, [0 0 0], [stimPW stimPW stimPW], elecname, velecnumber);
 writeline(bt,cmd)
-writeline(bt,strcat("stim ",elecname));
+writeline(bt,strcat("stim on "));
 
 c = clock;
 clockPrev = c(4)*3600+c(5)*60+c(6);
 while true
-    ampFES = read(u2,999,"double");  % ensure buffer is multiple of number of electrodes used 
+    ampFES = read(u2,8190,"double");  % ensure buffer is multiple of number of electrodes used 
     c = clock;
     clockNew = c(4)*3600+c(5)*60+c(6); 
     if clockNew > clockPrev+0.010      %Send stim every period
-        round(pwFES(end-2:end))
+        round(ampFES(end-2:end))
         cmd = generate_command(elecArray, round(ampFES(end-2:end)), [stimPW stimPW stimPW], elecname, velecnumber);
         writeline(bt,cmd)
         clockPrev = clockNew; 

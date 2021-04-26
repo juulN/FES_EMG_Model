@@ -12,7 +12,7 @@ open 'calibrationSim'
 bt = bluetoothdev
 elecname = "testname1"
 
-nTrials = 6;
+nTrials = 4;
 
 
 %% Pulses 
@@ -37,11 +37,11 @@ for i = 1:length(nElec)
                 write(u1,0,"double","LocalHost",5000);
                 break;
             end
-            pause(3) 
+            pause(2) 
             disp('stim off') 
             writeline(bt,strcat("stim off"));
             write(u1,0,"double","LocalHost",5000);
-            pause(3)
+            pause(2)
         end
     end
     set_param('calibrationSim','SimulationCommand','stop')
