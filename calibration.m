@@ -1,4 +1,4 @@
-function [mdl] = calibration(nElec, stimAmpM, forceMax, modelStructure, bluetoothdev,u2)
+function [mdl] = calibration(nElec, stimAmpM, forceMax, stimPulseWidth, modelStructure, bluetoothdev)
 %CALIBRATION Collects input output data and identifies hammerstein model 
 %   Detailed explanation goes here
 
@@ -21,37 +21,27 @@ nTrials = 6;
 for i = 1:length(nElec)
     set_param('calibrationSim','SimulationCommand','start')
     for j = 1:nTrials
-        for k = 100:50:400      % FES pulse width 
+        for k = 1:stimAmpM      % FES pulse width 
             force = read(u2,buffer,"double");
-            stimAmp = stimAmpM;
-            display(k)
-    %       b = uint8(abs(a(1))*stimCalibration)
+            disp(k)
             if force(buffer) < forceMax
-                display('stim on') 
+                disp('stim on') 
                 writeline(bt,strcat("freq ",num2str(200)));
-                cmd = generate_command([nElec(i)], [stimAmp], [k], elecname)
+                cmd = generate_command([nElec(i)], [k], [stimPulseWidth], elecname)
                 writeline(bt,cmd)
                 writeline(bt,strcat("stim ",elecname));
                 write(u1,k,"double","LocalHost",5000);
             else
-                forceMax = force(buffer)
-                stimAmp = 0;
-                cmd = generate_command([nElec(i)], [stimAmp], [k], elecname)
-                writeline(bt,cmd)
-                writeline(bt,strcat("stim ",elecname));
+                forceMax = force(buffer); 
                 writeline(bt,strcat("stim off"));
-                write(u1,k,"double","LocalHost",5000);
+                write(u1,0,"double","LocalHost",5000);
                 break;
             end
             pause(3) 
-            display('stim off') 
-            stimAmp = 0;
-            writeline(bt,strcat("freq ",num2str(200)));
-            cmd = generate_command([nElec(i)], [stimAmp], [k], elecname);
-            writeline(bt,cmd)
-            writeline(bt,strcat("stim ",elecname));
+            disp('stim off') 
+            writeline(bt,strcat("stim off"));
             write(u1,0,"double","LocalHost",5000);
-            pause(4)
+            pause(3)
         end
     end
     set_param('calibrationSim','SimulationCommand','stop')
