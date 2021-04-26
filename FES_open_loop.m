@@ -26,14 +26,15 @@ writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") %
                       % %amplitude 
 %% Select elecs
 maxAmp = 12;
-% elecArray = selectElec(bt, maxAmp)
+elecArray = selectElec(bt, maxAmp)
 %% Set parameters/initialise model
 buffer = 1000; % Buffer for?? 
-elecArray = [11, 15, 13]; % Electrode number for each finger 
+% elecArray = [11, 15, 13]; % Electrode number for each finger 
+elecArray = [15];
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
 
 %% Identification of model for each electrode
-maxStimAmp = 10;
+maxStimAmp = 8;
 maxForce = 0.2; 
 
 h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
@@ -63,7 +64,8 @@ testname = "testname1";
 % elecArray = [16, 1, 5];
 % amplitude =6; 
 velecnumber = 10;
-maxStimAmp = 9;
+% maxStimAmp = 9;
+elecArray = [11, 15, 13]; % Electrode number for each finger 
 
 stimAmp = maxStimAmp; 
 elecname = "testname1"
