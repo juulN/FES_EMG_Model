@@ -28,7 +28,7 @@ for i = 1:length(nElec)
     %       b = uint8(abs(a(1))*stimCalibration)
             if force(buffer) < forceMax
                 display('stim on') 
-                writeline(bt,strcat("freq ",num2str(35)));
+                writeline(bt,strcat("freq ",num2str(200)));
                 cmd = generate_command([nElec(i)], [stimAmp], [k], elecname)
                 writeline(bt,cmd)
                 writeline(bt,strcat("stim ",elecname));
