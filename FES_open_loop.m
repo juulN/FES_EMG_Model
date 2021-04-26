@@ -88,7 +88,7 @@ while true
     pwFES = read(u2,999,"double");  % ensure buffer is multiple of number of electrodes used 
     c = clock;
     clockNew = c(4)*3600+c(5)*60+c(6); 
-    if clockNew > clockPrev+0.010      %Send stim every period
+    if clockNew > clockPrev+1      %Send stim every period
         round(pwFES(end-2:end))
         cmd = generate_command(elecArray, [stimAmp stimAmp stimAmp], round(pwFES(end-2:end)), elecname, velecnumber);
         writeline(bt,cmd)
