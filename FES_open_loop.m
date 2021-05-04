@@ -26,73 +26,62 @@ writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") %
                       % %amplitude 
                       
 %% test
-writeline(bt,strcat("freq ",num2str(200)));
-cmd = generate_command([15], [7], [300], elecname);
-writeline(bt,cmd)
-writeline(bt,strcat("stim ",elecname));
+% writeline(bt,strcat("freq ",num2str(200)));
+% cmd = generate_command([15], [7], [300], elecname);
+% writeline(bt,cmd)
+% writeline(bt,strcat("stim ",elecname));
 %% Select elecs
 maxAmp = 12;
 elecArray = selectElec(bt, maxAmp)
 %% Set parameters/initialise model
 buffer = 1000; % Buffer for?? 
-elecArray = [11, 13, 14]; % Electrode number for each finger 
+% elecArray = [11, 15, 13]; % Electrode number for each finger 
+elecArray = [9];   % Currently models and scripts set to only stim with one electrode!
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
-
-%% Identification of model for each electrode
 maxStimAmp = 9;
 maxForce = 0.2; 
 
+%% Identification of model for each electrode
 h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
-
-% T1 = load('FES_force_AY_21_03_11_1.mat');
-% stimAmpID = T1.ans.data(1:408024,2);
-% gripForceID = smoothdata(T1.ans.data(1:408024,1), 'SmoothingFactor', 0.03);
-% 
-% stimAmpV = T1.ans.data(408024:end,2);
-% gripForceV = smoothdata(T1.ans.data(408024:end,1), 'SmoothingFactor', 0.03);
-% 
-% %
-% h_mdls{1} = nlhw(iddata(stimAmpID, gripForceID, 0.001), H_mdl); 
-% h_mdls{2} = nlhw(iddata(stimAmpID, gripForceID, 0.001), H_mdl); 
-% h_mdls{3} = nlhw(iddata(stimAmpID, gripForceID, 0.001), H_mdl); 
-% plot(h_mdls{1})
-
 
 %% Stimulate 
 clear u2
-writeline(bt, "sdcard rm default/test/ve5.ptn ")
-writeline(bt, "sdcard cat > default/test/ve5.ptn ")
-writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 500 ") % 
-
-testname = "testname1"; 
-% Anode is 2, select others 
-% elecArray = [16, 1, 5];
-% amplitude =6; 
-velecnumber = 5;
-maxStimAmp = 9;
-
-stimAmp = maxStimAmp; 
-elecname = "testname1"
 u2 = udpport("LocalPort",22392) %increase by one if error
+
+velecnumber = 11;           % Choose velec that has not been defined
+elecArray = [11, 9, 13];   % Electrode number for each finger (CURRENTLY ONLY MIDDLE ONE WILL BE STIMMED!) 
+                            % do not select 2 bc it is the anode 
+stimAmp = maxStimAmp; 
+
 
 open 'openloopFEScontrollerSim'
 set_param('openloopFEScontrollerSim','SimulationCommand','start')
 
+writeline(bt,strcat("freq ",num2str(200)));      %Set stim frequency
+cmd = generate_command(elecArray, [0 0 0], [300 300 300], elecname, velecnumber); % Params for start stimulation
+writeline(bt,cmd)                               %Start stimulation
+writeline(bt,strcat("stim on "));               %Start stimulation 
+
 c = clock;
 clockPrev = c(4)*3600+c(5)*60+c(6);
 while true
-    pwFES = read(u2,999,"double");  % ensure buffer is multiple of number of electrodes used 
+    pwFES = read(u2,8190,"double");  % ensure buffer is multiple of number of electrodes used 
     c = clock;
     clockNew = c(4)*3600+c(5)*60+c(6); 
-    if clockNew > clockPrev+0.5
+    if clockNew > clockPrev+0.02      %Send stim every 0.01s
         round(pwFES(end-2:end))
-        writeline(bt,strcat("freq ",num2str(200)));
-        cmd = generate_command(elecArray, [stimAmp stimAmp stimAmp], round(pwFES(end-2:end)), elecname);
+%         clock
+        cmd = generate_command(elecArray, [0 0 0], round(pwFES(end-2:end)), elecname, velecnumber);
         writeline(bt,cmd)
-        writeline(bt,strcat("stim ",elecname));
         clockPrev = clockNew; 
     end
 end
+%%
+% press CTRL+C to stop and send: writeline(bt,"stim off ")
+% Stop stimulation with: set_param('openloopFEScontrollerSim','SimulationCommand','stop')
+% Save recorded data with: save('openloop_0405_T1', 'controllerData')
+writeline(bt,"stim off ")
 set_param('openloopFEScontrollerSim','SimulationCommand','stop')
 
-save('openloopT3', 'controllerData')
+filename = sprintf('OpenLoop_%s', datestr(now,'mm-dd-yyyy HH-MM'));
+save(filename, 'controllerData')

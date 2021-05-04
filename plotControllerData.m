@@ -1,7 +1,7 @@
 %% plot controller data
 % Script to plot controller data FES controller sim 
 % clear all; close all; clc
-load('openloopT13.mat', 'controllerData')
+load('OpenLoop_05-04-2021 17-34.mat', 'controllerData')
 
 figure; 
 sgtitle('Open loop control')
@@ -29,16 +29,17 @@ grid on
 grid minor
 
 %%
-load('hmdls_JN.mat')
+load('hmdls_0426_27.mat')
 plot(h_mdls{1})
-plot(h_mdls{2})
-plot(h_mdls{3})
+% plot(h_mdls{2})
+% plot(h_mdls{3})
 
 
 
 
 %%
-load('calibrationRecording_04-21-2021 13-46.mat')
+load('calibrationRecording_04-26-2021 16-52.mat')
+plot(calibrationRecording.Data)
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
 halfIdx = ceil(size(calibrationRecording.time,1)/2);
    
@@ -54,7 +55,7 @@ compare(iddata(gripForceV, stimAmpV, 0.001), mdl)
 figure;
 compare(iddata(stimAmpV,gripForceV, 0.001), h_mdls{1})
 %%
-load('calibrationRecording_04-15-2021 19-22.mat')
+load('calibrationRecording_04-26-2021 11-30.mat')
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
 halfIdx = ceil(size(calibrationRecording.time,1)/2);
    
@@ -70,7 +71,7 @@ compare(iddata(gripForceV, stimAmpV, 0.001), mdl)
 figure;
 compare(iddata(stimAmpV,gripForceV, 0.001), h_mdls{2})
 %%
-load('calibrationRecording_04-15-2021 19-26.mat')
+load('calibrationRecording_04-26-2021 13-21.mat')
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
 halfIdx = ceil(size(calibrationRecording.time,1)/2);
    

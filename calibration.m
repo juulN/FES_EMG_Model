@@ -12,6 +12,10 @@ open 'calibrationSim'
 bt = bluetoothdev
 elecname = "testname1"
 
+writeline(bt, "sdcard rm default/test/ve5.ptn ")
+writeline(bt, "sdcard cat > default/test/ve5.ptn ")
+writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") % 
+
 nTrials = 6;
 
 
@@ -46,12 +50,9 @@ for i = 1:length(nElec)
             pause(3) 
             display('stim off') 
             stimAmp = 0;
-            writeline(bt,strcat("freq ",num2str(200)));
-            cmd = generate_command([nElec(i)], [stimAmp], [k], elecname);
-            writeline(bt,cmd)
-            writeline(bt,strcat("stim ",elecname));
+            writeline(bt,strcat("stim off "));
             write(u1,0,"double","LocalHost",5000);
-            pause(4)
+            pause(2)
         end
     end
     set_param('calibrationSim','SimulationCommand','stop')
