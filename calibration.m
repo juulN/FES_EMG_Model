@@ -12,7 +12,7 @@ open 'calibrationSim'
 bt = bluetoothdev
 elecname = "testname1"
 
-nTrials = 4;
+nTrials = 6;
 
 
 %% Pulses 
@@ -61,7 +61,7 @@ for i = 1:length(nElec)
     save(filename, 'calibrationRecording') 
     disp('Identifying model, please wait...')
     % Divide data for identification and validation
-    halfIdx = ceil(size(calibrationRecording.time,1)/2);
+    halfIdx = ceil(size(calibrationRecording.time,1)*2/3);
     
     stimAmpID = calibrationRecording.data(1:halfIdx,2);
     gripForceID = smoothdata(calibrationRecording.data(1:halfIdx,1), 'SmoothingFactor', 0.03');
