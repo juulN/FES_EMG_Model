@@ -39,14 +39,14 @@ for i = 1:15
         disp('stim on') 
 
         cmd = generate_command([i], [stimAmp], [stimPW], elecname); 
-        writeline(bt,strcat("freq ",num2str(200)));
+        writeline(bt,strcat("freq ",num2str(35), " "));
         writeline(bt,cmd)
         writeline(bt,strcat("stim ",elecname));
  
         pause(1) 
         disp('stim off') 
         stimAmp = 0;
-        writeline(bt,strcat("freq ",num2str(200)));
+        writeline(bt,strcat("freq ",num2str(35), " "));
         cmd = generate_command([i], [stimAmp], [stimPW], elecname);
         writeline(bt,cmd)
         writeline(bt,strcat("stim ",elecname));
