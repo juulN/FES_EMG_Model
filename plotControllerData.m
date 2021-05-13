@@ -2,50 +2,57 @@
 % Script to plot controller data FES controller sim 
 % clear all; close all; clc
 load('OpenLoop_05-04-2021 17-50', 'controllerData')
-
+controllerData.data(:,4) = controllerData.data(:,4) * 70 * 9.81; 
+controllerData.data(:,5) = controllerData.data(:,5) * 70 * 9.81; 
 figure; 
-sgtitle('Open loop control')
-subplot(4,1,1)
+% sgtitle('Open loop control')
+subplot(2,1,1)
 title('Force trajectory')
 % plot(controllerData.time, controllerData.data(:,4), 'LineWidth', 1)
 hold on 
 plot(controllerData.time, controllerData.data(:,5), 'LineWidth', 1)
 hold off
-xlim([0 200])
+xlim([21.98 22.06])
+ylim([0 50])
 % legend('Desired', 'Measured')
 legend('Measured')
 grid on 
 grid minor
-ylabel('Force') 
-subplot(4,1,2)
-title('Stimulus pulsewidth') 
-plot(controllerData.time, controllerData.data(:,1), 'LineWidth', 1)
-hold on 
-% plot(controllerData.time, controllerData.data(:,2), 'LineWidth', 1)
-% plot(controllerData.time, controllerData.data(:,3), 'LineWidth', 1)
-hold off
-xlim([0 200])
-ylabel('Pulsewidth (\mus)')
-xlabel('Time (s)')
-% legend('Electrode 1', 'Electrode 2', 'Electrode 3') 
-grid on 
-grid minor
+ylabel('Force (N)') 
+% subplot(4,1,2)
+% title('Stimulus pulsewidth') 
+% plot(controllerData.time, controllerData.data(:,1), 'LineWidth', 1)
+% hold on 
+% % plot(controllerData.time, controllerData.data(:,2), 'LineWidth', 1)
+% % plot(controllerData.time, controllerData.data(:,3), 'LineWidth', 1)
+% hold off
+% xlim([0 200])
+% ylabel('Pulsewidth (\mus)')
+% xlabel('Time (s)')
+% % legend('Electrode 1', 'Electrode 2', 'Electrode 3') 
+% grid on 
+% grid minor
 
-subplot(4,1,3)
-title('EMG') 
+subplot(2,1,2)
 % plot(SinAY.Time(220586:end)/1000, SinAY.ExtAUX1(220586:end))    % Sampling rate is 1kHz
 % hold on 
 % plot(SinAY.Time(220586:end)/1000, SinAY.FlexAUX2(220586:end))
-plot(SinVolAY2.Time/1000, SinVolAY2.ExtAUX1)    % Sampling rate is 1kHz
+% plot(SinVolAY2.Time/1000, SinVolAY2.ExtAUX1-SinVolAY2.ExtAUX1(1))  
+plot([0:0.001:222.000],outEMGsim(:,2)-outEMGsim(1,2))
+
+% Sampling rate is 1kHz
+title('Flexor EMG') 
 
 hold off 
-xlim([0 200])
+xlim([21.98 22.06])
+
 ylabel('EMG (\uV)')
 xlabel('Time (s)')
-legend('Flexor') 
+title('Flexor EMG') 
 grid on 
 grid minor
 
+figure;
 subplot(4,1,4)
 title('EMG') 
 % plot(SinAY.Time(220586:end)/1000, SinAY.ExtAUX1(220586:end))    % Sampling rate is 1kHz
@@ -63,9 +70,10 @@ grid on
 grid minor
 %%
 load('OpenLoop_05-04-2021 17-46', 'controllerData')
-
+controllerData.data(:,4) = controllerData.data(:,4) * 70 * 9.81; 
+controllerData.data(:,5) = controllerData.data(:,5) * 70 * 9.81; 
 figure; 
-sgtitle('Open loop control')
+% sgtitle('Open loop control')
 subplot(4,1,1)
 title('Force trajectory')
 % plot(controllerData.time, controllerData.data(:,4), 'LineWidth', 1)
@@ -73,67 +81,6 @@ hold on
 plot(controllerData.time, controllerData.data(:,5), 'LineWidth', 1)
 hold off
 xlim([0 600])
-% legend('Desired', 'Measured')
-legend('Measured')
-grid on 
-grid minor
-ylabel('Force') 
-subplot(4,1,2)
-title('Stimulus pulsewidth') 
-plot(controllerData.time, controllerData.data(:,1), 'LineWidth', 1)
-hold on 
-plot(controllerData.time, controllerData.data(:,2), 'LineWidth', 1)
-% plot(controllerData.time, controllerData.data(:,3), 'LineWidth', 1)
-hold off
-xlim([0 600])
-ylabel('Pulsewidth (\mus)')
-xlabel('Time (s)')
-% legend('Electrode 1', 'Electrode 2', 'Electrode 3') 
-grid on 
-grid minor
-
-subplot(4,1,3)
-title('EMG') 
-% plot(SinAY.Time(220586:end)/1000, SinAY.ExtAUX1(220586:end))    % Sampling rate is 1kHz
-% hold on 
-% plot(SinAY.Time(220586:end)/1000, SinAY.FlexAUX2(220586:end))
-plot(SinVolAY1.Time/1000, SinVolAY1.ExtAUX1)    % Sampling rate is 1kHz
-
-hold off 
-xlim([0 600])
-ylabel('EMG (\uV)')
-xlabel('Time (s)')
-legend('Flexor') 
-grid on 
-grid minor
-
-subplot(4,1,4)
-title('EMG') 
-% plot(SinAY.Time(220586:end)/1000, SinAY.ExtAUX1(220586:end))    % Sampling rate is 1kHz
-% hold on 
-% plot(SinAY.Time(220586:end)/1000, SinAY.FlexAUX2(220586:end))
-% plot(SinVolAY2.Time/1000, SinVolAY2.ExtAUX1)    % Sampling rate is 1kHz
-% hold on 
-plot(SinVolAY1.Time/1000, SinVolAY1.FlexAUX2)
-hold off 
-xlim([0 600])
-ylabel('EMG (\uV)')
-xlabel('Time (s)')
-legend('Extensor') 
-grid on 
-grid minor
-%%
-load('OpenLoop_05-04-2021 17-34', 'controllerData')
-
-figure; 
-sgtitle('Open loop control')
-subplot(4,1,1)
-title('Force trajectory')
-% plot(controllerData.time, controllerData.data(:,4), 'LineWidth', 1)
-hold on 
-plot(controllerData.time, controllerData.data(:,5), 'LineWidth', 1)
-hold off
-xlim([0 500])
 % legend('Desired', 'Measured')
 legend('Measured')
 grid on 
@@ -146,7 +93,7 @@ hold on
 plot(controllerData.time, controllerData.data(:,2), 'LineWidth', 1)
 % plot(controllerData.time, controllerData.data(:,3), 'LineWidth', 1)
 hold off
-xlim([0 500])
+xlim([0 600])
 ylabel('Pulsewidth (\mus)')
 xlabel('Time (s)')
 % legend('Electrode 1', 'Electrode 2', 'Electrode 3') 
@@ -154,20 +101,97 @@ grid on
 grid minor
 
 subplot(4,1,3)
-title('EMG') 
-plot(SinAY.Time/1000, SinAY.ExtAUX1)    % Sampling rate is 1kHz
+% plot(SinAY.Time(220586:end)/1000, SinAY.ExtAUX1(220586:end))    % Sampling rate is 1kHz
+% hold on 
+% plot(SinAY.Time(220586:end)/1000, SinAY.FlexAUX2(220586:end))
+plot(SinVolAY1.Time/1000, SinVolAY1.ExtAUX1-SinVolAY1.ExtAUX1(1))    % Sampling rate is 1kHz
+hold on
+plot([0:0.001:600.000],flexsinvolay1filt)
+hold off 
+xlim([0 600])
+ylabel('EMG (\uV)')
+xlabel('Time (s)')
+title('Flexor EMG') 
+legend('sEMG', 'filtered sEMG') 
+
+grid on 
+grid minor
+
+subplot(4,1,4)
+% plot(SinAY.Time(220586:end)/1000, SinAY.ExtAUX1(220586:end))    % Sampling rate is 1kHz
+% hold on 
+% plot(SinAY.Time(220586:end)/1000, SinAY.FlexAUX2(220586:end))
+% plot(SinVolAY2.Time/1000, SinVolAY2.ExtAUX1)    % Sampling rate is 1kHz
+% hold on 
+plot(SinVolAY1.Time/1000, SinVolAY1.FlexAUX2-SinVolAY1.FlexAUX2(1))
+hold on 
+plot([0:0.001:600.000],outEMGsim(:,6))
+hold off 
+xlim([0 600])
+ylabel('EMG (\uV)')
+xlabel('Time (s)')
+title('Extensor EMG') 
+
+legend('sEMG', 'filtered sEMG') 
+grid on 
+grid minor
+%%
+load('OpenLoop_05-04-2021 17-34', 'controllerData')
+controllerData = getsampleusingtime(controllerData, 5, 275);
+controllerData.data(:,4) = controllerData.data(:,4) * 70 * 9.81; 
+controllerData.data(:,5) = controllerData.data(:,5) * 70 * 9.81; 
+
+RMSE = sqrt(mean((controllerData.data(:,4)- controllerData.data(:,5)).^2))
+figure; 
+% sgtitle('Open loop control')
+subplot(2,1,1)
+title('Force trajectory')
+plot(controllerData.time, controllerData.data(:,4), 'LineWidth', 1)
+hold on 
+plot(controllerData.time, controllerData.data(:,5), 'LineWidth', 1)
+hold off
+% xlim([5 275])
+legend('Desired', 'Measured')
+% legend('Measured')
+grid on 
+grid minor
+ylabel('Force (N)') 
+title('Grip force')
+
+% % figure
+% subplot(4,1,2)
+% title('Stimulus pulsewidth') 
+% % plot(controllerData.time, controllerData.data(:,1), 'LineWidth', 1)
+% hold on 
+% plot(controllerData.time, round(controllerData.data(:,2),-1), 'LineWidth', 1)
+% % plot(controllerData.time, controllerData.data(:,3), 'LineWidth', 1)
+% hold off
+% % xlim([5 275])
+% ylabel('Pulsewidth (\mus)')
+% xlabel('Time (s)')
+% % legend('Electrode 1', 'Electrode 2', 'Electrode 3') 
+% grid on 
+% grid minor
+
+% figure
+subplot(2,1,2)
+% plot(SinAY.Time/1000, SinAY.ExtAUX1)    % Sampling rate is 1kHz
+plot([0:0.001:222.000],outEMGsim(:,6))
+
 % hold on 
 % plot(SinAY.Time(220586:end)/1000, SinAY.FlexAUX2(220586:end))
 % plot(SinVolAY1.Time/1000, SinVolAY1.ExtAUX1)    % Sampling rate is 1kHz
+title('Flexor EMG') 
 
 hold off 
 xlim([0 550])
 ylabel('EMG (\uV)')
 xlabel('Time (s)')
-legend('Flexor') 
+% legend('Flexor') 
 grid on 
 grid minor
 
+figure
 subplot(4,1,4)
 title('EMG') 
 % plot(SinAY.Time(220586:end)/1000, SinAY.ExtAUX1(220586:end))    % Sampling rate is 1kHz
@@ -177,25 +201,26 @@ plot(SinAY.Time/1000, SinAY.FlexAUX2)
 % hold on 
 % plot(SinVolAY1.Time/1000, SinVolAY1.FlexAUX2)
 hold off 
+title('Extensor EMG')
 xlim([0 550])
 ylabel('EMG (\uV)')
 xlabel('Time (s)')
-legend('Extensor') 
+% legend('Extensor') 
 grid on 
 grid minor
 %%
 figure;
-signal = SinVolAY2.FlexAUX2;
+signal = SinVolAY1.FlexAUX2;
 y = fft(signal); 
 fs = 1000;
 f = (0:length(y)-1)*fs/length(y);
 plot(f, abs(y))
-signal2 = SinVolAY2.FlexAUX2;
+signal2 = SinVolAY1.FlexAUX2;
 
 %%
 fs = 1000;
 fo = 20; 
-q = 16; 
+q = 3; 
 bw = (fo/(fs/2))/q; 
 
 [num, den] = iircomb(fs/fo, bw, 'notch'); 
@@ -206,13 +231,14 @@ d = designfilt('bandstopiir','FilterOrder',4, ...
                'HalfPowerFrequency1',49,'HalfPowerFrequency2',51, ...
                'DesignMethod','butter','SampleRate',fs);
 %%
-% x = combFilt(signal);
-x = filtfilt(d, signal); 
+x = combFilt(signal);
+x = filtfilt(d, x); 
 figure
 title('EMG') 
-plot(SinVolAY2.Time/1000, x)
+plot(SinVolAY1.Time/1000, SinVolAY1.FlexAUX2)    % Sampling rate is 1kHz\
 hold on 
-plot(SinVolAY2.Time/1000, SinVolAY2.FlexAUX2)    % Sampling rate is 1kHz
+plot(SinVolAY1.Time/1000, x)
+hold off
 %%
 [num, den] = iircomb(fs/fo, bw, 'notch'); 
 combFilt2 = dsp.IIRFilter('Numerator', num ,'Denominator', den); 
@@ -222,9 +248,9 @@ x2 = combFilt2(signal2);
 x2 = filtfilt(d,signal);
 figure
 title('EMG') 
-plot(SinVolAY2.Time/1000, x2)
+plot(SinVolAY1.Time/1000, x2)
 hold on 
-plot(SinVolAY2.Time/1000, SinVolAY2.FlexAUX2)    % Sampling rate is 1kHz
+plot(SinVolAY1.Time/1000, SinVolAY1.FlexAUX2)    % Sampling rate is 1kHz
 
 % fvtool(d, 'Fs', 1000)
 
