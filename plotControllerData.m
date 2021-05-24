@@ -294,7 +294,8 @@ plot(h_mdls{1})
 %%
 load('calibrationRecording_04-26-2021 16-52.mat')
 plot(calibrationRecording.Data)
-h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
+inputNL = pwlinear('NumberOfUnits', 7);
+h_mdl_struct = idnlhw([2 3 1], inputNL, []); 
 halfIdx = ceil(size(calibrationRecording.time,1)/2);
    
 stimAmpID = calibrationRecording.data(1:halfIdx,2);
@@ -303,11 +304,13 @@ gripForceID = smoothdata(calibrationRecording.data(1:halfIdx,1), 'SmoothingFacto
 stimAmpV = calibrationRecording.data(halfIdx+1:end,2);
 gripForceV = smoothdata(calibrationRecording.data(halfIdx+1:end,1), 'SmoothingFactor', 0.03');
 mdl= nlhw(iddata(gripForceID, stimAmpID, 0.001), h_mdl_struct); 
+mdl2= nlhw(iddata(stimAmpID,gripForceID, 0.001), h_mdl_struct); 
+
 plot(mdl)
 figure; 
 compare(iddata(gripForceV, stimAmpV, 0.001), mdl)
 figure;
-compare(iddata(stimAmpV,gripForceV, 0.001), h_mdls{1})
+compare(iddata(stimAmpV,gripForceV, 0.001), mdl2)
 %%
 load('calibrationRecording_04-26-2021 11-30.mat')
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
