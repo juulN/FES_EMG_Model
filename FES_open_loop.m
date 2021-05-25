@@ -23,13 +23,13 @@ writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") %
 %% Set parameters/initialise model
 elecArray = [15];   % Currently models and scripts set to only stim with one electrode!
 h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
-maxStimAmp = 12;
+maxStimAmp = 8;
 maxForce = 0.2; 
                       
 %% **************** Select stimulation electrode **************************
 % Call function that cycles through all electrodes to find the one with the
 % best/most comfortable grip force output
-elecArray = selectElec(bt, maxStimAmp);
+elecArray = selectElec(bt, maxStimAmp)
 maxStimAmp = input('Maximum comfortable stimulation amplitude: ');
 
 while maxStimAmp > 20 || maxStimAmp < 0
@@ -45,17 +45,18 @@ h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
 clear u2
 u2 = udpport("LocalPort",22392); % open udp for FES pw from simulink, clear port if error
 
-velecnumber = 11;           % Choose velec that has not been defined, do not select 2 bc it is the anode 
-stimAmp = maxStimAmp; 
 
-eval('!matlab  -nodesktop -nosplash -r "RDAtoSimulink(450)" &') % start tcp for emg recording
+velecnumber = 11;           % Choose velec that has not been defined, do not select 2 bc it is the anode 
+stimAmp = 8; 
+
+% eval('!matlab  -nodesktop -nosplash -r "RDAtoSimulink(450)" &') % start tcp for emg recording
 
 % open 'openloopFEScontrollerSim'
 % set_param('openloopFEScontrollerSim','SimulationCommand','start')
-open 'PID_FEScontrollerSim'
-set_param('PID_FEScontrollerSim','SimulationCommand','start')
+% open 'PID_FEScontrollerSim'
+% set_param('PID_FEScontrollerSim','SimulationCommand','start')
 
-writeline(bt,strcat("freq ",num2str(200), " "));      %Set stim frequency
+writeline(bt,strcat("freq ",num2str(20), " "));      %Set stim frequency
 cmd = generate_command(elecArray, [0], [300], elecname, velecnumber); % Params for start stimulation
 writeline(bt,cmd)                               %Start stimulation
 writeline(bt,strcat("stim on "));               %Start stimulation 
@@ -63,13 +64,16 @@ writeline(bt,strcat("stim on "));               %Start stimulation
 c = clock;
 clockPrev = c(4)*3600+c(5)*60+c(6);
 clockStart = clockPrev;
+clockNew = clockPrev;
 while clockNew<clockStart+400
-    pwFES = read(u2,8190,"double");  % ensure buffer is multiple of number of electrodes used 
+%     disp('before read');
+    pwFES = read(u2,1,"double");  % ensure buffer is multiple of number of electrodes used 
+%     disp('after read');
     c = clock;
-    clockNew = c(4)*3600+c(5)*60+c(6); 
+    clockNew = c(4)*3600+c(5)*60+c(6);
     if clockNew > clockPrev+0.02      %Send stim every 0.01s
-        round(pwFES(end))
-        cmd = generate_command(elecArray, [0], round(pwFES(end)), elecname, velecnumber);
+%         disp(pwFES(end))
+        cmd = generate_command(elecArray, [stimAmp], round(pwFES(end)), elecname, velecnumber);
         writeline(bt,cmd)
         clockPrev = clockNew; 
     end
@@ -79,9 +83,9 @@ end
 writeline(bt,"stim off ")
 
 % set_param('openloopFEScontrollerSim','SimulationCommand','stop')
-set_param('PID_FEScontrollerSim','SimulationCommand','stop')
+% set_param('PID_FEScontrollerSim','SimulationCommand','stop')
 
-% filename = sprintf('OpenLoop_%s', datestr(now,'mm-dd-yyyy HH-MM'));
-filename = sprintf('PID_%s', datestr(now,'mm-dd-yyyy HH-MM'));
+filename = sprintf('OpenLoop_%s', datestr(now,'mm-dd-yyyy HH-MM'));
+% filename = sprintf('PID_%s', datestr(now,'mm-dd-yyyy HH-MM'));
 
 save(filename, 'controllerData')

@@ -38,7 +38,7 @@ subplot(2,1,2)
 % hold on 
 % plot(SinAY.Time(220586:end)/1000, SinAY.FlexAUX2(220586:end))
 % plot(SinVolAY2.Time/1000, SinVolAY2.ExtAUX1-SinVolAY2.ExtAUX1(1))  
-plot([0:0.001:222.000],outEMGsim(:,2)-outEMGsim(1,2))
+% plot([0:0.001:222.000],~(:,2)-outEMGsim(1,2))
 
 % Sampling rate is 1kHz
 title('Flexor EMG') 
@@ -292,9 +292,9 @@ plot(h_mdls{1})
 
 
 %%
-load('calibrationRecording_04-26-2021 16-52.mat')
+load('calibrationRecording_05-25-2021 18-01.mat')
 plot(calibrationRecording.Data)
-inputNL = pwlinear('NumberOfUnits', 7);
+inputNL = pwlinear('NumberOfUnits', 10);
 h_mdl_struct = idnlhw([2 3 1], inputNL, []); 
 halfIdx = ceil(size(calibrationRecording.time,1)/2);
    
