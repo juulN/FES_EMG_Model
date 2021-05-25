@@ -6,45 +6,43 @@ function [mdl] = calibration(nElec, stimAmpM, forceMax, modelStructure, bluetoot
 % Ensure real-time kernell is installed
 u1 = udpport("LocalPort",12386) %increase by one if error
 u2 = udpport("LocalPort",22387) %increase by one if error
-u3 = udpport("LocalPort", 132)
+% u3 = udpport("LocalPort", 132)
 
 buffer = 1000;
-% open 'calibrationSim'
+open 'calibrationSim'
 
 
-% bt = bluetoothdev
-% elecname = "testname1"
-% 
-% writeline(bt, "sdcard rm default/test/ve5.ptn ")
-% writeline(bt, "sdcard cat > default/test/ve5.ptn ")
-% writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") % 
+bt = bluetoothdev
+elecname = "testname1";
+
+writeline(bt, "sdcard rm default/test/ve5.ptn ")
+writeline(bt, "sdcard cat > default/test/ve5.ptn ")
+writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") % 
 % startSimCalibration
-nTrials = 6;
-
-
-%% Pulses 
-nElec = 1;
-stimAmpM = 12;
-forceMax = 2;
+nTrials = 4;
+set_param('calibrationSim','SimulationCommand','start')
+eval('!matlab  -nodesktop -nosplash -r "RDAtoSimulink" &') % -nodesktop -nosplash
+disp('Waiting for tcp connection')
+pause(10)
+disp('Continue')
+%% Pulses
 
 % Start stim for calibration
 for i = 1:length(nElec)
 %      set_param('calibrationSim','SimulationCommand','start')
-    eval('!matlab -r "startSimCalibration" &') % -nodesktop -nosplash
+%     eval('!matlab -r "startSimCalibration" &') % -nodesktop -nosplash
     for j = 1:nTrials
         for k = 100:50:400      % FES pulse width 
             force = read(u2,buffer,"double");
             stimAmp = stimAmpM;
             display(k)
     %       b = uint8(abs(a(1))*stimCalibration)
-%             if force(buffer) < forceMax
-                            if 0 < forceMax
-
+            if force(buffer) < forceMax
                 display('stim on') 
-%                 writeline(bt,strcat("freq ",num2str(200), " "));
+                writeline(bt,strcat("freq ",num2str(20), " "));
                 cmd = generate_command([nElec(i)], [stimAmp], [k], elecname)
-%                 writeline(bt,cmd)
-%                 writeline(bt,strcat("stim ",elecname));
+                writeline(bt,cmd)
+                writeline(bt,strcat("stim ",elecname));
                 write(u1,k,"double","LocalHost",5000);
             else
                 forceMax = force(buffer)
@@ -59,7 +57,7 @@ for i = 1:length(nElec)
             pause(3) 
             display('stim off') 
             stimAmp = 0;
-%             writeline(bt,strcat("stim off "));
+            writeline(bt,strcat("stim off "));
             write(u1,0,"double","LocalHost",5000);
             pause(2)
         end

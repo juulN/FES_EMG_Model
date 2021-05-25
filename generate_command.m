@@ -1,90 +1,37 @@
-%% Open loop FES control - 
-% Syncs with Simulink model calibrationSim
-clc; clear all; close all;
-
-
-%% Set up Bluetooth connection with Technalia FES device and Init UDP ports
-bt = bluetooth("0016A474B78F", 1);  %MAC address of device 
-writeline(bt,"iam DESKTOP");
-writeline(bt,"battery ? ");
-writeline(bt,"elec 1 *pads_qty 16");
-
-elecname = "testname1"
-
-% Init UDP ports for simulink comms 
-% matlab and simulink need to be separate instances (same computer)
-% u1 = udpport("LocalPort",12383) %increase by one if error
-% u2 = udpport("LocalPort",22383) %increase by one if error
-% 
-
-% Write new stim file (last char of string not transmitted -> add space at end of string)
-writeline(bt, "sdcard rm default/test/ve5.ptn ")
-writeline(bt, "sdcard cat > default/test/ve5.ptn ")
-writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") % 
-                                     % %pulsewith 
-                             % time(us)(1ms -3000ms)
-                      % %amplitude 
-                      
-%% test
-% writeline(bt,strcat("freq ",num2str(200)));
-% cmd = generate_command([15], [7], [300], elecname);
-% writeline(bt,cmd)
-% writeline(bt,strcat("stim ",elecname));
-%% Select elecs
-maxAmp = 12;
-elecArray = selectElec(bt, maxAmp)
-%% Set parameters/initialise model
-buffer = 1000; % Buffer for?? 
-% elecArray = [11, 15, 13]; % Electrode number for each finger 
-elecArray = [9];   % Currently models and scripts set to only stim with one electrode!
-h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
-maxStimAmp = 9;
-maxForce = 0.2; 
-
-%% Identification of model for each electrode
-h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
-
-%% Stimulate 
-clear u2
-u2 = udpport("LocalPort",22392) %increase by one if error
-
-velecnumber = 11;           % Choose velec that has not been defined
-elecArray = [11, 9, 13];   % Electrode number for each finger (CURRENTLY ONLY MIDDLE ONE WILL BE STIMMED!) 
-                            % do not select 2 bc it is the anode 
-stimAmp = maxStimAmp; 
-
-
-open 'openloopFEScontrollerSim'
-set_param('openloopFEScontrollerSim','SimulationCommand','start')
-
-model = Simulink.SimulationInput('openloopFEScontrollerSim')
-parsim(model, 'ShowSimulationManager', 'on') 
-
-writeline(bt,strcat("freq ",num2str(200), " "));      %Set stim frequency
-cmd = generate_command(elecArray, [0 0 0], [300 300 300], elecname, velecnumber); % Params for start stimulation
-writeline(bt,cmd)                               %Start stimulation
-writeline(bt,strcat("stim on "));               %Start stimulation 
-
-c = clock;
-clockPrev = c(4)*3600+c(5)*60+c(6);
-while true
-    pwFES = read(u2,8190,"double");  % ensure buffer is multiple of number of electrodes used 
-    c = clock;
-    clockNew = c(4)*3600+c(5)*60+c(6); 
-    if clockNew > clockPrev+0.02      %Send stim every 0.01s
-        round(pwFES(end-2:end))
-%         clock
-        cmd = generate_command(elecArray, [0 0 0], round(pwFES(end-2:end)), elecname, velecnumber);
-        writeline(bt,cmd)
-        clockPrev = clockNew; 
+function cmd = generate_command(electroderef, amplitude, pulsewidth,testname,velecnumber)
+    if nargin<5
+        velecnumber = 5;
     end
-end
-%%
-% press CTRL+C to stop and send: writeline(bt,"stim off ")
-% Stop stimulation with: set_param('openloopFEScontrollerSim','SimulationCommand','stop')
-% Save recorded data with: save('openloop_0405_T1', 'controllerData')
-writeline(bt,"stim off ")
-set_param('openloopFEScontrollerSim','SimulationCommand','stop')
+    cmd="";
+    cathodeslist = zeros(1,16);
+    amplitudelist = zeros(1,16);
+    pulsewidthlist = zeros(1,16);
+    for i = 1:length(electroderef)
+        if electroderef(i) >16
+            fprintf('Electrode reference not recognized')
+        end   
+        if pulsewidth(i)>400
+            fprintf('Please select a pulse width between 100 and 400 us')
+        end 
+        if amplitude(i)>20
+            fprintf('Amplitude selected is too high, Change the settings if you really want to proceed')
+        end   
+        
+        cathodeslist(electroderef(i))= 1;
+        amplitudelist(electroderef(i))= amplitude(i);
+        pulsewidthlist(electroderef(i))= pulsewidth(i);
+    end
 
-filename = sprintf('OpenLoop_%s', datestr(now,'mm-dd-yyyy HH-MM'));
-save(filename, 'controllerData')
+%     if electroderef(i) == 2
+%             fprintf('Electrode number 2 => change the anode settings')
+%             activeanode = "*anode 32768";
+%             
+%     else
+        activeanode = "*anode 2";
+%     end
+    activatecathodes = strcat("*cathodes 1="+num2str(cathodeslist(1)) +",2="+ num2str(cathodeslist(2))+",3="+ num2str(cathodeslist(3))+",4="+ num2str(cathodeslist(4))+",5="+ num2str(cathodeslist(5))+",6="+num2str(cathodeslist(6)) +",7="+ num2str(cathodeslist(7))+",8="+ num2str(cathodeslist(8))+",9="+num2str(cathodeslist(9))+",10="+num2str(cathodeslist(10))+",11="+ num2str(cathodeslist(11))+",12="+ num2str(cathodeslist(12))+",13="+num2str(cathodeslist(13))+",14="+ num2str(cathodeslist(14))+",15="+num2str(cathodeslist(15)) +",16="+num2str(cathodeslist(16))+", " );        
+    cathodesamplitudes = ("*amp 1="+num2str(amplitudelist(1)) +",2="+ num2str(amplitudelist(2))+",3="+ num2str(amplitudelist(3))+",4="+ num2str(amplitudelist(4))+",5="+ num2str(amplitudelist(5))+",6="+num2str(amplitudelist(6)) +",7="+ num2str(amplitudelist(7))+",8="+ num2str(amplitudelist(8))+",9="+num2str(amplitudelist(9))+",10="+num2str(amplitudelist(10))+",11="+ num2str(amplitudelist(11))+",12="+ num2str(amplitudelist(12))+",13="+num2str(amplitudelist(13))+",14="+ num2str(amplitudelist(14))+",15="+num2str(amplitudelist(15)) +",16="+num2str(amplitudelist(16))+", " );
+    cathodespulsewidth = ("*width 1="+num2str(pulsewidthlist(1)) +",2="+ num2str(pulsewidthlist(2))+",3="+ num2str(pulsewidthlist(3))+",4="+ num2str(pulsewidthlist(4))+",5="+ num2str(pulsewidthlist(5))+",6="+num2str(pulsewidthlist(6)) +",7="+ num2str(pulsewidthlist(7))+",8="+ num2str(pulsewidthlist(8))+",9="+num2str(pulsewidthlist(9))+",10="+num2str(pulsewidthlist(10))+",11="+ num2str(pulsewidthlist(11))+",12="+ num2str(pulsewidthlist(12))+",13="+num2str(pulsewidthlist(13))+",14="+ num2str(pulsewidthlist(14))+",15="+num2str(pulsewidthlist(15)) +",16="+num2str(pulsewidthlist(16))+", " );
+    cmd = ("velec "+num2str(velecnumber)+" *name "+testname+" *elec 1 "+activatecathodes+cathodesamplitudes+cathodespulsewidth+activeanode+" *selected 1 *sync 0"); %\r\n")
+ 
+end
