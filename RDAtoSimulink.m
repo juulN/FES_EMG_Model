@@ -23,11 +23,10 @@
 %
 % 
 % clear u1 u2
-pnet('closeall')
 %% ***********************************************************************   
-% u1 = udpport("LocalPort",12386) %increase by one if error
-u3 = udpport("LocalPort",1232) %increase by one if error
-
+function RDAtoSimulink(runtime)     %Runtime in seconds 
+pnet('closeall')
+u3 = udpport("LocalPort",1232); % UDP connection to simulink
 
 recorderip = '127.0.0.1';
 
@@ -41,19 +40,22 @@ if stat > 0
     disp('connection established');
 end
 
-k = 1;
-
-% set_param('calibrationSim','SimulationCommand','start')
-
-        
-while true 
-    data = RDA(connection);
-    if ~isempty(data)
-        write(u3,data(32,:),"double","LocalHost",6000);
-    end
-end 
-
-
+c = clock();
+clocknow= c(4)*3600+c(5)*60+c(6);
+clockstart = clocknow;
+disp('start')
+     
+    while clocknow <= clockstart + runtime 
+        c = clock();
+        clocknow= c(4)*3600+c(5)*60+c(6);
+        data = RDA(connection);
+        if ~isempty(data)
+            write(u3,data(32,:),"double","LocalHost",6000);
+        end
+    end 
+disp('end')
+pnet('closeall')
+end
 %%
 
 % Main RDA Client function

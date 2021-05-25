@@ -20,7 +20,7 @@ writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 1000 ") %
 %% Test electrodes 
 selectedElecs = []; 
 % Start stim for calibration
-for i = 1:15
+for i = 15:1
     if i == 2   % skip 2 bc anode
         continue
     end
