@@ -5,9 +5,9 @@ clc; clear all; close all;
 
 %% Set up Bluetooth connection with Technalia FES device and Init UDP ports
 bt = bluetooth("0016A474B78F", 1);  %MAC address of device 
-writeline(bt,"iam DESKTOP ");
+writeline(bt,"iam DESKTOP");
 writeline(bt,"battery ? ");
-writeline(bt,"elec 1 *pads_qty 16 ");
+writeline(bt,"elec 1 *pads_qty 16");
 
 elecname = "testname1"
 
