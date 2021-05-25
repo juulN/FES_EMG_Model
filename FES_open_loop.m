@@ -57,6 +57,9 @@ stimAmp = maxStimAmp;
 open 'openloopFEScontrollerSim'
 set_param('openloopFEScontrollerSim','SimulationCommand','start')
 
+model = Simulink.SimulationInput('openloopFEScontrollerSim')
+parsim(model, 'ShowSimulationManager', 'on') 
+
 writeline(bt,strcat("freq ",num2str(200), " "));      %Set stim frequency
 cmd = generate_command(elecArray, [0 0 0], [300 300 300], elecname, velecnumber); % Params for start stimulation
 writeline(bt,cmd)                               %Start stimulation
