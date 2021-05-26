@@ -26,7 +26,7 @@ h_mdl_struct = idnlhw([3 4 1], 'pwlinear', []);
 maxStimAmp = 9;
 maxForce = 1; 
                       
-%% **************** Select stimulation electrode **************************
+%% **************** Select stimulation electrode - do not run **************************
 % Call function that cycles through all electrodes to find the one with the
 % best/most comfortable grip force output
 elecArray = selectElec(bt, maxStimAmp)
@@ -39,15 +39,19 @@ end
 %% ***************** Model identification *********************************
 % Identification of model for each electrode
 h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
-%%
+
+%% ***************** Experiment Settings - run this in new Matlab Instance (MI2) *********************************
+% Experiment Settings
 maxF = 0.033; % Change before running!
 Kp = 10000;
 Ki = 0;
 Kd = 0; 
-load('controllpattern.mat')
+load('controlpattern.mat')
 load('mdl')
 h_mdls = mdl;
-%% ******************** Controller ***************************************
+%Then open and start FESControllerSim
+
+%% ******************** Controller - Run in MI1 after runnning Simulink in MI2 ***************************************
 % Select appropriate simulink model (openloop, PID)
 clear u2
 u2 = udpport("LocalPort",22392); % open udp for FES pw from simulink, clear port if error
