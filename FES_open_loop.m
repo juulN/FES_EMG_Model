@@ -21,10 +21,10 @@ writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") %
                              % time(us)(1ms -3000ms)
                       % %amplitude 
 %% Set parameters/initialise model
-elecArray = [15];   % Currently models and scripts set to only stim with one electrode!
-h_mdl_struct = idnlhw([2 3 1], 'pwlinear', []); 
-maxStimAmp = 8;
-maxForce = 0.2; 
+elecArray = [1];   % Currently models and scripts set to only stim with one electrode!
+h_mdl_struct = idnlhw([3 4 1], 'pwlinear', []); 
+maxStimAmp = 9;
+maxForce = 1; 
                       
 %% **************** Select stimulation electrode **************************
 % Call function that cycles through all electrodes to find the one with the
@@ -39,7 +39,14 @@ end
 %% ***************** Model identification *********************************
 % Identification of model for each electrode
 h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
-
+%%
+maxF = 0.033; % Change before running!
+Kp = 10000;
+Ki = 0;
+Kd = 0; 
+load('controllpattern.mat')
+load('mdl')
+h_mdls = mdl;
 %% ******************** Controller ***************************************
 % Select appropriate simulink model (openloop, PID)
 clear u2
@@ -47,7 +54,7 @@ u2 = udpport("LocalPort",22392); % open udp for FES pw from simulink, clear port
 
 
 velecnumber = 11;           % Choose velec that has not been defined, do not select 2 bc it is the anode 
-stimAmp = 8; 
+ stimAmp = maxStimAmp; 
 
 % eval('!matlab  -nodesktop -nosplash -r "RDAtoSimulink(450)" &') % start tcp for emg recording
 
@@ -80,8 +87,11 @@ while clockNew<clockStart+400
 end
 %% ****************** Save data *******************************************
 % press CTRL+C to stop early
+cmd = generate_command(elecArray, [1], 100, 'testname1', 11); % Params for start stimulation
+writeline(bt,cmd) 
 writeline(bt,"stim off ")
 
+%%
 % set_param('openloopFEScontrollerSim','SimulationCommand','stop')
 % set_param('PID_FEScontrollerSim','SimulationCommand','stop')
 
