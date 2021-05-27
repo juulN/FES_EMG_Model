@@ -56,9 +56,10 @@ h_mdls = mdl;
 clear u2
 u2 = udpport("LocalPort",22392); % open udp for FES pw from simulink, clear port if error
 
-
 velecnumber = 11;           % Choose velec that has not been defined, do not select 2 bc it is the anode 
- stimAmp = maxStimAmp; 
+maxStimAmp = 9;
+stimAmp = maxStimAmp;
+elecArray = [1];
 
 % eval('!matlab  -nodesktop -nosplash -r "RDAtoSimulink(450)" &') % start tcp for emg recording
 
@@ -82,7 +83,7 @@ while clockNew<clockStart+400
 %     disp('after read');
     c = clock;
     clockNew = c(4)*3600+c(5)*60+c(6);
-    if clockNew > clockPrev+0.02      %Send stim every 0.01s
+    if clockNew > clockPrev+0.05      %Send stim every 0.01s
 %         disp(pwFES(end))
         cmd = generate_command(elecArray, [stimAmp], round(pwFES(end)), elecname, velecnumber);
         writeline(bt,cmd)
