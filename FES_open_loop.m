@@ -23,18 +23,18 @@ writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") %
 %% Set parameters/initialise model
 elecArray = [1];   % Currently models and scripts set to only stim with one electrode!
 h_mdl_struct = idnlhw([3 4 1], 'pwlinear', []); 
-maxStimAmp = 9;
+maxStimAmp = 6;
 maxForce = 1; 
                       
 %% **************** Select stimulation electrode - do not run **************************
 % Call function that cycles through all electrodes to find the one with the
 % best/most comfortable grip force output
-elecArray = selectElec(bt, maxStimAmp)
-maxStimAmp = input('Maximum comfortable stimulation amplitude: ');
-
-while maxStimAmp > 20 || maxStimAmp < 0
-            maxStimAmp = input('Please enter valid stim amplitude: ');
-end
+% elecArray = selectElec(bt, maxStimAmp)
+% maxStimAmp = input('Maximum comfortable stimulation amplitude: ');
+% 
+% while maxStimAmp > 20 || maxStimAmp < 0
+%             maxStimAmp = input('Please enter valid stim amplitude: ');
+% end
 
 %% ***************** Model identification *********************************
 % Identification of model for each electrode
@@ -42,7 +42,7 @@ h_mdls = calibration(elecArray, maxStimAmp, maxForce,h_mdl_struct, bt);
 
 %% ***************** Experiment Settings - run this in new Matlab Instance (MI2) *********************************
 % Experiment Settings
-maxF = 0.033; % Change before running!
+maxF = 0.04; % Change before running!
 Kp = 10000;
 Ki = 0;
 Kd = 0; 
