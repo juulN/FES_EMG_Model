@@ -41,35 +41,6 @@ forceRead = 0;
 % Start stim for calibration
 for i = 1:length(nElec)
     for j = 1:nTrials
-%         for k = 100:50:400      % FES pulse width 
-%             force = read(u2,buffer,"double");
-%             stimAmp = stimAmpM;
-%             disp(k)
-%     %       b = uint8(abs(a(1))*stimCalibration)
-%             if force(buffer) < forceMax
-%                 disp('stim on') 
-%                 writeline(bt,strcat("freq ",num2str(20), " "));
-%                 cmd = generate_command([nElec(i)], [stimAmp], [k], elecname);
-%                 writeline(bt,cmd)
-%                 writeline(bt,strcat("stim ",elecname));
-%                 write(u1,k,"double","LocalHost",5000);
-%             else
-%                 forceMax = force(buffer);
-%                 stimAmp = 0;
-%                 cmd = generate_command([nElec(i)], [stimAmp], [k], elecname);
-%                 writeline(bt,cmd)
-%                 writeline(bt,strcat("stim ",elecname));
-%                 writeline(bt,strcat("stim off "));
-%                 write(u1,k,"double","LocalHost",5000);
-%                 break;
-%             end
-%             pause(3) 
-%             disp('stim off') 
-%             writeline(bt,strcat("stim off "));
-%             write(u1,0,"double","LocalHost",5000);
-%             pause(2)
-%         end
-
         for k = 100:30:400      % FES pulse width 
             force = read(u2,buffer,"double");
             if force(buffer)>forceRead
@@ -81,59 +52,91 @@ for i = 1:length(nElec)
             if force(buffer) < forceMax
                 disp('stim on') 
 %                 writeline(bt,strcat("freq ",num2str(20), " "));
-                cmd = generate_command([nElec(i)], [stimAmp], [k], elecname, velecnumber);
+                cmd = generate_command([nElec(i)], [stimAmp], [k], elecname);
                 writeline(bt,cmd)
-%                 writeline(bt,strcat("stim ",elecname));
+                writeline(bt,strcat("stim ",elecname));
                 write(u1,k,"double","LocalHost",5000);
             else
-                disp('max force exceeded')
                 forceMax = force(buffer);
                 stimAmp = 0;
-                cmd = generate_command([nElec(i)], [stimAmp], [k], elecname, velecnumber);
+                cmd = generate_command([nElec(i)], [stimAmp], [k], elecname);
                 writeline(bt,cmd)
                 writeline(bt,strcat("stim ",elecname));
                 writeline(bt,strcat("stim off "));
                 write(u1,k,"double","LocalHost",5000);
                 break;
             end
-            pause(2.5) 
-%             disp('stim off') 
-%             writeline(bt,strcat("stim off "));
-%             write(u1,0,"double","LocalHost",5000);
-%             pause(2)
+            pause(3) 
+            disp('stim off') 
+            writeline(bt,strcat("stim off "));
+            write(u1,0,"double","LocalHost",5000);
+            pause(2)
         end
-        for k = 370:-30:100      % FES pulse width 
-            force = read(u2,buffer,"double");
-            if force(buffer)>forceRead
-                forceRead = force(buffer);
-            end
-            stimAmp = stimAmpM;
-            disp(k)
-    %       b = uint8(abs(a(1))*stimCalibration)
-            if force(buffer) < forceMax
-                disp('stim on') 
-%                 writeline(bt,strcat("freq ",num2str(20), " "));
-                cmd = generate_command([nElec(i)], [stimAmp], [k], elecname, velecnumber);
-                writeline(bt,cmd)
+
+%         for k = 100:30:400      % FES pulse width 
+%             force = read(u2,buffer,"double");
+%             if force(buffer)>forceRead
+%                 forceRead = force(buffer);
+%             end
+%             stimAmp = stimAmpM;
+%             disp(k)
+%     %       b = uint8(abs(a(1))*stimCalibration)
+%             if force(buffer) < forceMax
+%                 disp('stim on') 
+% %                 writeline(bt,strcat("freq ",num2str(20), " "));
+%                 cmd = generate_command([nElec(i)], [stimAmp], [k], elecname, velecnumber);
+%                 writeline(bt,cmd)
+% %                 writeline(bt,strcat("stim ",elecname));
+%                 write(u1,k,"double","LocalHost",5000);
+%             else
+%                 disp('max force exceeded')
+%                 forceMax = force(buffer);
+%                 stimAmp = 0;
+%                 cmd = generate_command([nElec(i)], [stimAmp], [k], elecname, velecnumber);
+%                 writeline(bt,cmd)
 %                 writeline(bt,strcat("stim ",elecname));
-                write(u1,k,"double","LocalHost",5000);
-            else
-                disp('max force exceeded')
-                forceMax = force(buffer);
-                stimAmp = 0;
-                cmd = generate_command([nElec(i)], [stimAmp], [k], elecname, velecnumber);
-                writeline(bt,cmd)
-                writeline(bt,strcat("stim ",elecname));
-                writeline(bt,strcat("stim off "));
-                write(u1,k,"double","LocalHost",5000);
-                break;
-            end
-            pause(2.5) 
-%             disp('stim off') 
-%             writeline(bt,strcat("stim off "));
-%             write(u1,0,"double","LocalHost",5000);
-%             pause(2)
-        end
+%                 writeline(bt,strcat("stim off "));
+%                 write(u1,k,"double","LocalHost",5000);
+%                 break;
+%             end
+%             pause(2.5) 
+% %             disp('stim off') 
+% %             writeline(bt,strcat("stim off "));
+% %             write(u1,0,"double","LocalHost",5000);
+% %             pause(2)
+%         end
+%         for k = 370:-30:100      % FES pulse width 
+%             force = read(u2,buffer,"double");
+%             if force(buffer)>forceRead
+%                 forceRead = force(buffer);
+%             end
+%             stimAmp = stimAmpM;
+%             disp(k)
+%     %       b = uint8(abs(a(1))*stimCalibration)
+%             if force(buffer) < forceMax
+%                 disp('stim on') 
+% %                 writeline(bt,strcat("freq ",num2str(20), " "));
+%                 cmd = generate_command([nElec(i)], [stimAmp], [k], elecname, velecnumber);
+%                 writeline(bt,cmd)
+% %                 writeline(bt,strcat("stim ",elecname));
+%                 write(u1,k,"double","LocalHost",5000);
+%             else
+%                 disp('max force exceeded')
+%                 forceMax = force(buffer);
+%                 stimAmp = 0;
+%                 cmd = generate_command([nElec(i)], [stimAmp], [k], elecname, velecnumber);
+%                 writeline(bt,cmd)
+%                 writeline(bt,strcat("stim ",elecname));
+%                 writeline(bt,strcat("stim off "));
+%                 write(u1,k,"double","LocalHost",5000);
+%                 break;
+%             end
+%             pause(2.5) 
+% %             disp('stim off') 
+% %             writeline(bt,strcat("stim off "));
+% %             write(u1,0,"double","LocalHost",5000);
+% %             pause(2)
+%         end
     end
     disp('stim off') 
     cmd = generate_command([nElec(i)], [1], [100], elecname, velecnumber); % Params for start stimulation
@@ -141,7 +144,8 @@ for i = 1:length(nElec)
     writeline(bt,strcat("stim off "));
     write(u1,0,"double","LocalHost",5000);
     disp('Maximum force read')
-    disp(forceRead)    
+    disp(forceRead)  
+    save('maxF', 'forceRead')
     set_param('calibrationSim','SimulationCommand','stop')
     filename = sprintf('calibrationRecording_%s', datestr(now,'mm-dd-yyyy HH-MM'));
     pause(1)
@@ -152,8 +156,9 @@ for i = 1:length(nElec)
 %     halfIdx = ceil(size(calibrationRecording.time,1)*2/3);
     
     stimAmpID = calibrationRecording.data(:,2);
-    gripForceID = smoothdata(calibrationRecording.data(:,1), 'SmoothingFactor', 0.03');
-    
+%     gripForceID = smoothdata(calibrationRecording.data(:,1), 'SmoothingFactor', 0.03');
+    gripForceID = lowpass(calibrationRecording.data(:,1), 50, 1000);
+
 %     stimAmpV = calibrationRecording.data(halfIdx+1:end,2);
 %     gripForceV = smoothdata(calibrationRecording.data(halfIdx+1:end,1), 'SmoothingFactor', 0.03');
     mdl{i}= nlhw(iddata(stimAmpID, gripForceID, 0.001), modelStructure); 
