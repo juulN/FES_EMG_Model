@@ -22,10 +22,10 @@ writeline(bt, "sdcard ed default/test/ve5.ptn CONST CONST R 100 100 3000 ") %
                              % time(us)(1ms -3000ms)
                       % %amplitude 
 %% Set parameters/initialise model
-elecArray = [14];   % Currently models and scripts set to only stim with one electrode!
+elecArray = [1];   % Currently models and scripts set to only stim with one electrode!
 inputNL = pwlinear('NumberOfUnits', 11);
 h_mdl_struct = idnlhw([3 4 1], inputNL, []); 
-maxStimAmp = 6;
+maxStimAmp = 9;
 maxForce = 1; 
                       
 %% **************** Select stimulation electrode - do not run **************************
@@ -50,6 +50,7 @@ maxF = forceRead;
 Kp = 15000;
 Ki = 10000;
 Kd = 0; 
+bias = 0;
 load('controlpattern.mat')
 % load('controlpatternVOL.mat')
 load('mdl')
@@ -65,6 +66,7 @@ maxF = forceRead;
 Kp = 15000;
 Ki = 10000;
 Kd = 0; 
+bias = 0;
 % load('controlpattern.mat')
 load('controlpatternVOL.mat')
 load('mdl')
@@ -74,7 +76,7 @@ open 'FEScontrollerSim'
 set_param('FEScontrollerSim','SimulationCommand','start')
 
 %% ******************** Controller - Run in MI1 after runnning Simulink in MI2 ***************************************
-% Select appropriate simulink model (openloop, PID)
+% Select appropriate simuli nk model (openloop, PID)
 clear u2
 u2 = udpport("LocalPort",22392); % open udp for FES pw from simulink, clear port if error
 
